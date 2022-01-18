@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "lib": ["esnext", "dom"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "strictFunctionTypes": true,
+    "alwaysStrict": true
+  },
+  "include": ["./src/**/*.ts", "./src/types"],
+  "exclude": ["./node_modules"]
+}
