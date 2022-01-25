@@ -1,12 +1,23 @@
+import dotenv from "dotenv";
+
+// Only in developement because Docker will be used for production
+if (process.env.NODE_ENV === "development") {
+  dotenv.config();
+}
+
 import Hapi from "@hapi/hapi";
 import Jwt from "@hapi/jwt";
+
+import Database from "./classes/Database";
 
 import * as config from "./config";
 import routes from "./routes";
 
 async function start() {
   const server = Hapi.server(config.server);
+  const database = new Database(config.database);
 
+  await database.init();
   await server.register(Jwt);
 
   server.auth.strategy("jwt_strategy", "jwt", {
@@ -38,4 +49,9 @@ async function start() {
   console.log("Server started on", server.info.uri);
 }
 
-start().catch((error) => console.error("Error was caught by root function.", error));
+process.on("unhandledRejection", () => process.exit(1));
+
+start().catch((error) => {
+  console.error("Error was caught by main function.", error);
+  process.exit(1);
+});

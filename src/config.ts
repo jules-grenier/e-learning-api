@@ -1,6 +1,8 @@
+const { SERVER_HOST, SERVER_PORT, JWT_SECRET, JWT_TTL, DB_CREDENTIALS } = process.env;
+
 const server = {
-  host: "localhost",
-  port: 8090,
+  host: SERVER_HOST || "localhost",
+  port: SERVER_PORT || 8090,
   router: {
     stripTrailingSlash: true,
   },
@@ -15,8 +17,12 @@ const server = {
 };
 
 const jwt = {
-  secretKey: "123456789",
-  ttl: 14400, // 4 hours
+  secretKey: JWT_SECRET,
+  ttl: Number(JWT_TTL) || 14400, // 4 hours
 };
 
-export { server, jwt };
+const database = {
+  ...JSON.parse(DB_CREDENTIALS),
+};
+
+export { server, jwt, database };

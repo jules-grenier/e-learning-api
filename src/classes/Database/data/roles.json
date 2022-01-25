@@ -1,0 +1,32 @@
+{
+  "student": {
+    "name": "student",
+    "inherit": [],
+    "permissions": [
+      "COURSE_BUY",
+      "FAVORITE_ADD",
+      "FAVORITE_DELETE",
+      "CART_CREATE",
+      "CART_UPDATE",
+      "ACCOUNT_UPDATE",
+      "ACCOUNT_DELETE"
+    ]
+  },
+  "teacher": {
+    "name": "teacher",
+    "inherit": ["student"],
+    "permissions": ["COURSE_CREATE_OWN", "COURSE_UPDATE_OWN", "COURSE_DELETE_OWN"]
+  },
+  "admin": {
+    "name": "admin",
+    "inherit": ["student", "teacher"],
+    "permissions": [
+      "COURSE_CREATE_ALL",
+      "COURSE_UPDATE_ALL",
+      "COURSE_DELETE_ALL",
+      "USER_CREATE",
+      "USER_UPDATE",
+      "USER_DELETE"
+    ]
+  }
+}
