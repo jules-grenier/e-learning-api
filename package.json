@@ -6,17 +6,21 @@
   "license": "MIT",
   "scripts": {
     "start": "tsc && node dist/main.js",
-    "dev": "ts-node-dev --respawn --project ./tsconfig.json --rs src/main.ts",
+    "dev": "NODE_ENV=development ts-node-dev --respawn --project ./tsconfig.json --rs src/main.ts",
     "lint": "eslint && tsc"
   },
   "dependencies": {
     "@hapi/hapi": "^20.2.1",
-    "@hapi/jwt": "^2.1.0"
+    "@hapi/jwt": "^2.1.0",
+    "dotenv": "^14.3.0",
+    "moment": "^2.29.1",
+    "pg": "^8.7.1"
   },
   "devDependencies": {
     "@types/hapi__hapi": "^20.0.10",
     "@types/hapi__jwt": "^2.0.1",
     "@types/node": "^17.0.8",
+    "@types/pg": "^8.6.4",
     "@typescript-eslint/eslint-plugin": "^5.9.1",
     "@typescript-eslint/parser": "^5.9.1",
     "eslint": "^7.32.0",
