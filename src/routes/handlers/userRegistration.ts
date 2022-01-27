@@ -21,14 +21,14 @@ async function userRegistration(req: RegistrationRequest, h: ResponseToolkit) {
   try {
     hashedPassword = await hashPasswordAsync(payload.password);
   } catch (error) {
-    console.log("Failed to hash password.", error);
+    console.error("Failed to hash password.", error);
     return h.response("Internal Server Error").code(500);
   }
 
   try {
     roleId = await req.server.app.database.getRoleId(role);
   } catch (error) {
-    console.log("Failed to get role id", error);
+    console.error("Failed to get role id", error);
     return h.response("Internal Server Error").code(500);
   }
 
@@ -53,7 +53,7 @@ async function userRegistration(req: RegistrationRequest, h: ResponseToolkit) {
   try {
     await req.server.app.database.insertUser(userDatabase);
   } catch (error) {
-    console.log("Failed to insert user.", error);
+    console.error("Failed to insert user.", error);
     return h.response("Internal Server Error").code(500);
   }
 

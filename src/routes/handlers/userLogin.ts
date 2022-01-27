@@ -30,11 +30,11 @@ async function userLogin(req: LoginRequest, h: ResponseToolkit) {
 
     if (!isPasswordCorrect) return h.response("Bad credentials").code(401);
   } catch (error) {
-    console.log("Failed to verify password.", error);
+    console.error("Failed to verify password.", error);
     return h.response("Internal Server Error").code(500);
   }
 
-  const token = generateAuthToken(userWithPassword);
+  const token = generateAuthToken(userWithoutPassword);
 
   return {
     token,

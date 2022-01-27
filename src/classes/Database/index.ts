@@ -121,7 +121,7 @@ class Database {
       client = await this.pool.connect();
       await client.query(query);
     } catch (error) {
-      console.log("Database.insertUser()", error);
+      console.error("Database.insertUser() failed.", error);
       throw new Error(error);
     } finally {
       if (client) client.release();
@@ -249,6 +249,7 @@ class Database {
 
     return roleId;
   }
+
   async insertCourseFile(fileInfo: FileInfo): Promise<boolean> {
     let client: PoolClient;
     const date = getUTCDate();
