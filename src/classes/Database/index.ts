@@ -7,6 +7,7 @@ import { User, UserInsertion, UserWithoutPassword } from "@/types/user";
 import * as schemas from "./schemas";
 import roles from "./data/roles.json";
 import getUTCDate from "../../utils/getUTCDate";
+import { Course, FileInfo } from "@/types/courses";
 
 class Database {
   private pool: Pool;
@@ -77,7 +78,7 @@ class Database {
   }
 
   async init(): Promise<void> {
-    const tables = ["user_roles", "users", "courses"];
+    const tables = ["user_roles", "users", "courses", "course_files"];
 
     for await (const table of tables) {
       await this.createTable(table, table);
@@ -247,6 +248,81 @@ class Database {
     }
 
     return roleId;
+  }
+  async insertCourseFile(fileInfo: FileInfo): Promise<boolean> {
+    let client: PoolClient;
+    const date = getUTCDate();
+    const query: QueryConfig = {
+      text: `
+        insert into course_files
+          (
+            file_id,
+            file_type,
+            file_description,
+            file_location,
+            course_id,
+            owner_id,
+            created_at,
+            updated_at
+          )
+        values
+          ($1, $2, $3, $4, $5, $6, $7, $7)
+      `,
+      values: [
+        fileInfo.id,
+        fileInfo.type,
+        JSON.stringify(fileInfo.description),
+        fileInfo.location,
+        fileInfo.course_id,
+        fileInfo.owner_id,
+        date,
+      ],
+    };
+
+    try {
+      client = await this.pool.connect();
+      await client.query(query);
+    } catch (error) {
+      console.error("Database.insertFile() failed.", error);
+      throw new Error(error);
+    } finally {
+      if (client) client.release();
+    }
+
+    return true;
+  }
+
+  async insertCourse(course: Course): Promise<boolean> {
+    let client: PoolClient;
+    const date = getUTCDate();
+    const query: QueryConfig = {
+      text: `
+        insert into courses
+          (
+            course_id,
+            course_title,
+            course_description,
+            author_id,
+            created_at,
+            updated_at
+          )
+          values
+            ($1, $2, $3, $4, $5, $5)
+      `,
+      values: [course.id, course.title, JSON.stringify(course.description), course.author_id, date],
+    };
+
+    try {
+      client = await this.pool.connect();
+      await client.query(query);
+    } catch (error) {
+      console.error("Database.insertFile() failed.", error);
+      throw new Error(error);
+    } finally {
+      if (client) client.release();
+    }
+
+    return true;
   }
 }
 
