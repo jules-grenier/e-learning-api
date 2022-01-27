@@ -12,6 +12,7 @@
   "dependencies": {
     "@hapi/hapi": "^20.2.1",
     "@hapi/jwt": "^2.1.0",
+    "argon2": "^0.28.3",
     "dotenv": "^14.3.0",
     "moment": "^2.29.1",
     "pg": "^8.7.1"
