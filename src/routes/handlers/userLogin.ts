@@ -1,7 +1,8 @@
 import { Request, ResponseToolkit } from "hapi__hapi";
 
-import { UserLogin } from "@/types/user";
+import { User, UserLogin } from "@/types/user";
 import generateAuthToken from "../../utils/generateAuthToken";
+import verifyPasswordAsync from "../../utils/verifyPasswordAsync";
 
 interface LoginRequest extends Request {
   payload: UserLogin;
@@ -10,14 +11,30 @@ interface LoginRequest extends Request {
 async function userLogin(req: LoginRequest, h: ResponseToolkit) {
   const { payload } = req;
 
-  const user = req.server.app.database.users.find((user) => user.email === payload.email);
-  const userWithoutPassword = { ...user };
+  let userWithPassword: User;
+
+  try {
+    userWithPassword = await req.server.app.database.getUserWithPassword(payload.email);
+  } catch (error) {
+    console.error("Failed to get user with password.", error);
+    return h.response("Internal Server Error").code(500);
+  }
+
+  const userWithoutPassword = { ...userWithPassword };
   delete userWithoutPassword.password;
 
-  if (!user) return h.response("Bad credentials").code(401);
-  if (payload.password !== user.password) return h.response("Bad credentials").code(401);
+  if (!userWithPassword) return h.response("Bad credentials").code(401);
 
-  const token = generateAuthToken(user);
+  try {
+    const isPasswordCorrect = await verifyPasswordAsync(userWithPassword.password, payload.password);
+
+    if (!isPasswordCorrect) return h.response("Bad credentials").code(401);
+  } catch (error) {
+    console.log("Failed to verify password.", error);
+    return h.response("Internal Server Error").code(500);
+  }
+
+  const token = generateAuthToken(userWithPassword);
 
   return {
     token,

@@ -1,7 +1,8 @@
 import { Pool, PoolClient, PoolConfig, QueryConfig } from "pg";
 
-import { Schemas } from "@/types/database";
+import { Schemas, UserWithPasswordResult, UserResult } from "@/types/database";
 import { Roles } from "@/types/roles";
+import { User, UserInsertion, UserWithoutPassword } from "@/types/user";
 
 import * as schemas from "./schemas";
 import roles from "./data/roles.json";
@@ -83,6 +84,169 @@ class Database {
     }
 
     await this.initRoles();
+  }
+
+  async insertUser(user: UserInsertion): Promise<boolean> {
+    let client: PoolClient | undefined;
+    const date = getUTCDate();
+    const query: QueryConfig = {
+      text: `
+        insert into users (
+          user_id,
+          role_id,
+          email,
+          firstname,
+          lastname,
+          password,
+          profile_picture,
+          created_at,
+          updated_at
+        )
+        values ($1, $2, $3, $4, $5, $6, $7, $8, $8)
+      `,
+      values: [
+        user.id,
+        user.role_id,
+        user.email,
+        user.firstname,
+        user.lastname,
+        user.password,
+        user.profile_picture,
+        date,
+      ],
+    };
+
+    try {
+      client = await this.pool.connect();
+      await client.query(query);
+    } catch (error) {
+      console.log("Database.insertUser()", error);
+      throw new Error(error);
+    } finally {
+      if (client) client.release();
+    }
+
+    return true;
+  }
+
+  async getUserWithPassword(idOrEmail: string): Promise<User> {
+    let user: User;
+    let client: PoolClient;
+    const query: QueryConfig = {
+      text: `
+        select
+          user_id,
+          users.role_id,
+          user_roles.role_name,
+          firstname,
+          lastname,
+          email,
+          password,
+          profile_picture
+        from
+          users
+        inner join user_roles
+          on users.role_id = user_roles.role_id
+        where
+          user_id = $1
+        or
+          email = $1
+      `,
+      values: [idOrEmail],
+    };
+
+    try {
+      client = await this.pool.connect();
+      const res = await client.query(query);
+      const data: UserWithPasswordResult = res.rows[0];
+
+      user = {
+        id: data.user_id,
+        firstname: data.firstname,
+        lastname: data.lastname,
+        email: data.email,
+        password: data.password,
+        role: data.role_name,
+        profile_picture: data.profile_picture,
+      };
+    } catch (error) {
+      console.error("Database.getUser() failed.", error);
+      throw new Error(error);
+    } finally {
+      if (client) client.release();
+    }
+
+    return user;
+  }
+
+  async getUser(idOrEmail: string): Promise<UserWithoutPassword> {
+    let user: UserWithoutPassword;
+    let client: PoolClient;
+    const query: QueryConfig = {
+      text: `
+        select
+          user_id,
+          users.role_id,
+          user_roles.role_name,
+          firstname,
+          lastname,
+          email,
+          profile_picture
+        from
+          users
+        inner join user_roles
+          on users.role_id = user_roles.role_id
+        where
+          user_id = $1
+        or
+          email = $1
+      `,
+      values: [idOrEmail],
+    };
+
+    try {
+      client = await this.pool.connect();
+      const res = await client.query(query);
+      const data: UserResult = res.rows[0];
+
+      user = {
+        id: data.user_id,
+        firstname: data.firstname,
+        lastname: data.lastname,
+        email: data.email,
+        role: data.role_name,
+        profile_picture: data.profile_picture,
+      };
+    } catch (error) {
+      console.error("Database.getUserWithoutPassword() failed.", error);
+      throw new Error(error);
+    } finally {
+      if (client) client.release();
+    }
+
+    return user;
+  }
+
+  async getRoleId(roleName: string): Promise<number> {
+    let client: PoolClient;
+    let roleId: number;
+    const query: QueryConfig = {
+      text: `select role_id from user_roles where role_name = $1`,
+      values: [roleName],
+    };
+
+    try {
+      client = await this.pool.connect();
+      const res = await client.query(query);
+      roleId = res.rows[0].role_id;
+    } catch (error) {
+      console.error("Database.getRoleId() failed.", error);
+      throw new Error(error);
+    } finally {
+      if (client) client.release();
+    }
+
+    return roleId;
   }
 }
 

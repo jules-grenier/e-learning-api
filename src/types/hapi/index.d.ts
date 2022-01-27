@@ -1,10 +1,8 @@
-import { User } from "../user";
+import Database from "../../classes/Database";
 
 declare module "@hapi/hapi" {
   interface ServerApplicationState {
-    database: {
-      users: User[];
-    };
+    database: Database;
   }
 }
 

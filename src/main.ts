@@ -41,7 +41,7 @@ async function start() {
 
   server.auth.default("jwt_strategy");
 
-  server.app.database = { users: [] };
+  server.app.database = database;
 
   routes.forEach((route) => server.route(route));
 

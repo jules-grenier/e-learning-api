@@ -5,6 +5,7 @@ export interface User {
   email: string;
   password: string;
   role: string;
+  profile_picture: string;
 }
 
 export interface UserWithoutPassword {
@@ -13,6 +14,7 @@ export interface UserWithoutPassword {
   lastname: string;
   email: string;
   role: string;
+  profile_picture?: string;
 }
 
 export interface UserRegistration {
@@ -25,4 +27,10 @@ export interface UserRegistration {
 export interface UserLogin {
   email: string;
   password: string;
+}
+
+export interface UserInsertion extends UserRegistration {
+  id: string;
+  role_id: number;
+  profile_picture: string;
 }

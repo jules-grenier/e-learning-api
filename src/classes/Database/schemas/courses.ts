@@ -1,5 +1,5 @@
 const schema = `(
-  course_id varchar(20) unique primary key not null,
+  course_id varchar(40) unique primary key not null,
   author_id varchar(20) not null,
   email varchar(255) unique not null,
   firstname varchar(100) not null,
