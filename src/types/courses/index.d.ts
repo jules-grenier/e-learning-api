@@ -35,3 +35,33 @@ export interface Course {
   author_id: string;
   files_info: FileInfo[];
 }
+
+export interface CourseFile {
+  course_id: string;
+  course_title: string;
+  course_description: string;
+  created_at: string;
+  updated_at: string;
+  author_name: string;
+  author_id: string;
+  file_id: string;
+  file_location: string;
+  file_type: string;
+  file_description: string;
+}
+
+export interface CoursePopulated {
+  id: string;
+  title: string;
+  description: string;
+  author_name: string;
+  author_id: string;
+  created_at: string;
+  updated_at: string;
+  content: {
+    id: string;
+    description: string;
+    type: string;
+    location: string;
+  }[];
+}

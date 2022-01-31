@@ -1,4 +1,16 @@
+import getCourses from "./handlers/getCourses";
 import courseCreation from "./handlers/courseCreation";
+
+const GETs = [
+  {
+    method: "GET",
+    path: "/courses",
+    handler: getCourses,
+    config: {
+      auth: false,
+    },
+  },
+];
 
 const POSTs = [
   {
@@ -18,4 +30,4 @@ const POSTs = [
   },
 ];
 
-export default [...POSTs];
+export default [...GETs, ...POSTs];

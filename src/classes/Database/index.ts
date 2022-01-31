@@ -7,7 +7,7 @@ import { User, UserInsertion, UserWithoutPassword } from "@/types/user";
 import * as schemas from "./schemas";
 import roles from "./data/roles.json";
 import getUTCDate from "../../utils/getUTCDate";
-import { Course, FileInfo } from "@/types/courses";
+import { Course, CourseFile, FileInfo } from "@/types/courses";
 
 class Database {
   private pool: Pool;
@@ -324,6 +324,44 @@ class Database {
     }
 
     return true;
+  }
+
+  async getCourses(): Promise<CourseFile[]> {
+    let client: PoolClient;
+    let courses: CourseFile[];
+    const query: QueryConfig = {
+      text: `
+        select
+          course_files.course_id,
+          courses.course_id,
+          file_id,
+          file_location,
+          file_type,
+          file_description,
+          courses.*,
+          users.firstname || ' ' || users.lastname as author_name
+        from course_files
+        inner join courses
+          on course_files.course_id = courses.course_id
+        inner join users
+          on course_files.owner_id = users.user_id
+        order by
+          course_files.created_at desc
+      `,
+    };
+
+    try {
+      client = await this.pool.connect();
+      const res = await client.query(query);
+      courses = res.rows;
+    } catch (error) {
+      console.log("Database.getCourses() failed.", error);
+      throw new Error(error);
+    } finally {
+      if (client) client.release();
+    }
+
+    return courses;
   }
 }
 
