@@ -9,6 +9,11 @@ const POSTs = [
       auth: {
         mode: "required",
       },
+      payload: {
+        output: "stream",
+        parse: true,
+        multipart: true,
+      },
     },
   },
 ];

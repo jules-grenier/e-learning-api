@@ -1,5 +1,13 @@
-export interface CourseContentObject {
-  file: File;
+import { Stream } from "stream";
+
+interface CourseFileStream extends Stream {
+  hapi: {
+    filename: string;
+    headers: { [key: string]: string };
+  };
+}
+
+export interface CourseContentDetails {
   description: string;
   type: string;
 }
@@ -16,7 +24,8 @@ export interface FileInfo {
 export interface CourseCreation {
   course_title: string;
   course_description: string;
-  content: string;
+  content: CourseFileStream | CourseFileStream[];
+  content_details: string;
 }
 
 export interface Course {

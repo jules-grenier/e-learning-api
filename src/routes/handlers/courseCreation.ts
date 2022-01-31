@@ -1,9 +1,12 @@
 import { Request, ResponseToolkit } from "hapi__hapi";
+import fs from "fs";
+import path from "path";
 
 import generateIdAsync from "../../utils/generateIdAsync";
 import getUserFromRequest from "../../utils/getUserFromRequest";
+import getFileExtension from "../../utils/getFileExtension";
 
-import { CourseCreation, Course, CourseContentObject, FileInfo } from "@/types/courses";
+import { CourseCreation, Course, FileInfo, CourseContentDetails } from "@/types/courses";
 
 interface CourseCreationRequest extends Request {
   payload: CourseCreation;
@@ -13,18 +16,23 @@ async function courseCreation(req: CourseCreationRequest, h: ResponseToolkit) {
   const { payload } = req;
   const courseId = await generateIdAsync();
   const user = getUserFromRequest(req);
-  const content: CourseContentObject[] = JSON.parse(payload.content);
+  const content = Array.isArray(payload.content) ? payload.content : [payload.content];
+  const contentDetails: CourseContentDetails[] = JSON.parse(payload.content_details);
+  const folderPath = path.join(__dirname, "../../../course_files");
+
   let filesInfos: FileInfo[] = await Promise.all(
-    content.map(async (contentObject) => {
+    contentDetails.map(async (details, index) => {
+      const fileStream = content[index];
       const fileId = await generateIdAsync();
-      const location = "somewhere";
+      const fileExtension = getFileExtension(fileStream);
+      const location = `${folderPath}/${courseId}.${fileId}.${fileExtension}`;
 
       return {
         id: fileId,
         course_id: courseId,
         owner_id: user.id,
-        description: contentObject.description,
-        type: contentObject.type,
+        description: details.description,
+        type: details.type,
         location,
       };
     })
@@ -38,7 +46,14 @@ async function courseCreation(req: CourseCreationRequest, h: ResponseToolkit) {
     files_info: filesInfos,
   };
 
-  // TODO : save files
+  try {
+    content.forEach((file, index) => {
+      const stream = fs.createWriteStream(filesInfos[index].location);
+      file.pipe(stream);
+    });
+  } catch (error) {
+    console.error("Failed to save course files.", error);
+  }
 
   try {
     await req.server.app.database.insertCourse(course);
