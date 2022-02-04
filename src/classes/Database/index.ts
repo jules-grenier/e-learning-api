@@ -1,4 +1,5 @@
 import { Pool, PoolClient, PoolConfig, QueryConfig } from "pg";
+import format from "pg-format";
 
 import { Schemas, UserWithPasswordResult, UserResult } from "@/types/database";
 import { Roles } from "@/types/roles";
@@ -364,6 +365,34 @@ class Database {
     }
 
     return courses;
+  }
+
+  async getCoursePrices(courseIds: string[]): Promise<number[]> {
+    let client: PoolClient;
+    let coursePrices: number[];
+    const query = format(
+      `
+        select
+          price
+        from courses
+        where
+          course_id in (%L)
+      `,
+      courseIds
+    );
+
+    try {
+      client = await this.pool.connect();
+      const res = await client.query(query);
+      coursePrices = res.rows.map((course: any) => course.price);
+    } catch (error) {
+      console.error("Database.getCoursePrices() failed.", error);
+      throw new Error(error);
+    } finally {
+      if (client) client.release();
+    }
+
+    return coursePrices;
   }
 }
 

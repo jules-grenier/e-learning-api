@@ -1,4 +1,4 @@
-const { SERVER_HOST, SERVER_PORT, JWT_SECRET, JWT_TTL, DB_CREDENTIALS } = process.env;
+const { SERVER_HOST, SERVER_PORT, JWT_SECRET, JWT_TTL, DB_CREDENTIALS, STRIPE_SECRET_KEY } = process.env;
 
 const server = {
   host: SERVER_HOST || "localhost",
@@ -25,4 +25,6 @@ const database = {
   ...JSON.parse(DB_CREDENTIALS),
 };
 
-export { server, jwt, database };
+const stripeSk = STRIPE_SECRET_KEY;
+
+export { server, jwt, database, stripeSk };
