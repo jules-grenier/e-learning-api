@@ -42,6 +42,7 @@ async function courseCreation(req: CourseCreationRequest, h: ResponseToolkit) {
     id: courseId,
     title: payload.course_title,
     description: payload.course_description,
+    price: Number(payload.course_price),
     author_id: user.id,
     files_info: filesInfos,
   };

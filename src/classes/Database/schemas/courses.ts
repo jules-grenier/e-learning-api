@@ -2,6 +2,7 @@ const schema = `(
   course_id varchar(40) unique primary key not null,
   course_title varchar(255) not null,
   course_description json not null,
+  price int not null,
   author_id varchar(40) not null,
   created_at timestamp not null,
   updated_at timestamp not null,

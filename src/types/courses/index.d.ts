@@ -24,6 +24,7 @@ export interface FileInfo {
 export interface CourseCreation {
   course_title: string;
   course_description: string;
+  course_price: string;
   content: CourseFileStream | CourseFileStream[];
   content_details: string;
 }
@@ -32,6 +33,7 @@ export interface Course {
   id: string;
   title: string;
   description: string;
+  price: number;
   author_id: string;
   files_info: FileInfo[];
 }
@@ -40,6 +42,7 @@ export interface CourseFile {
   course_id: string;
   course_title: string;
   course_description: string;
+  course_price: number;
   created_at: string;
   updated_at: string;
   author_name: string;
@@ -54,6 +57,7 @@ export interface CoursePopulated {
   id: string;
   title: string;
   description: string;
+  price: number;
   author_name: string;
   author_id: string;
   created_at: string;

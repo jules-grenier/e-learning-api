@@ -303,14 +303,15 @@ class Database {
             course_id,
             course_title,
             course_description,
+            price,
             author_id,
             created_at,
             updated_at
           )
           values
-            ($1, $2, $3, $4, $5, $5)
+            ($1, $2, $3, $4, $5, $6, $6)
       `,
-      values: [course.id, course.title, JSON.stringify(course.description), course.author_id, date],
+      values: [course.id, course.title, JSON.stringify(course.description), course.price, course.author_id, date],
     };
 
     try {
@@ -339,6 +340,7 @@ class Database {
           file_type,
           file_description,
           courses.*,
+          courses.price as course_price,
           users.firstname || ' ' || users.lastname as author_name
         from course_files
         inner join courses
