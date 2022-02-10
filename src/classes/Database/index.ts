@@ -8,7 +8,7 @@ import { User, UserInsertion, UserWithoutPassword } from "@/types/user";
 import * as schemas from "./schemas";
 import roles from "./data/roles.json";
 import getUTCDate from "../../utils/getUTCDate";
-import { Course, CourseFile, FileInfo } from "@/types/courses";
+import { Course, CourseFile, FileInfo, UserCourseFile } from "@/types/courses";
 
 class Database {
   private pool: Pool;
@@ -367,6 +367,47 @@ class Database {
     return courses;
   }
 
+  async getCourse(id: string): Promise<CourseFile[]> {
+    let client: PoolClient;
+    let courseFiles: CourseFile[];
+    const query: QueryConfig = {
+      text: `
+        select
+          course_files.course_id,
+          courses.course_id,
+          file_id,
+          file_location,
+          file_type,
+          file_description,
+          courses.*,
+          courses.price as course_price,
+          users.firstname || ' ' || users.lastname as author_name
+        from course_files
+        inner join courses
+          on course_files.course_id = courses.course_id
+        inner join users
+          on course_files.owner_id = users.user_id
+        where course_files.course_id = $1
+        order by
+          course_files.created_at desc
+      `,
+      values: [id],
+    };
+
+    try {
+      client = await this.pool.connect();
+      const res = await client.query(query);
+      courseFiles = res.rows;
+    } catch (error) {
+      console.log("Database.getCourse() failed.", error);
+      throw new Error(error);
+    } finally {
+      if (client) client.release();
+    }
+
+    return courseFiles;
+  }
+
   async getCoursePrices(courseIds: string[]): Promise<number[]> {
     let client: PoolClient;
     let coursePrices: number[];
@@ -393,6 +434,75 @@ class Database {
     }
 
     return coursePrices;
+  }
+
+  async addCoursesToUser(courseIds: string[], userId: string): Promise<void> {
+    let client: PoolClient;
+    const date = getUTCDate();
+    const values = courseIds.map((courseId) => [courseId, userId, date, date]);
+    const query = format(
+      `
+        insert into "${userId}_courses"
+          (course_id, user_id, created_at, updated_at)
+        values
+          %L
+      `,
+      values
+    );
+
+    try {
+      client = await this.pool.connect();
+      await client.query(query);
+    } catch (error) {
+      console.error("Database.addCoursesToUser() failed.", error);
+      throw new Error(error);
+    } finally {
+      if (client) client.release();
+    }
+  }
+
+  async getUserCourses(userId: string): Promise<UserCourseFile[]> {
+    let client: PoolClient;
+    let courses: UserCourseFile[];
+    const userCoursesTable = `${userId}_courses`;
+    const query: QueryConfig = {
+      text: `
+      select
+        course_files.course_id,
+        courses.course_id,
+        course_files.file_id,
+        course_files.file_location,
+        course_files.file_type,
+        course_files.file_description,
+        courses.*,
+        "${userCoursesTable}".ongoing,
+        "${userCoursesTable}".finished,
+        users.firstname || ' ' || users.lastname as author_name
+      from
+        course_files
+      inner join courses
+        on course_files.course_id = courses.course_id
+      inner join users
+        on course_files.owner_id = users.user_id
+      inner join "${userCoursesTable}"
+        on course_files.course_id = "${userCoursesTable}".course_id
+      order by
+        course_files.created_at desc
+      `,
+    };
+
+    try {
+      client = await this.pool.connect();
+      const res = await client.query(query);
+      courses = res.rows;
+    } catch (error) {
+      console.log("Database.getUserCourses() failed.", error);
+      throw new Error(error);
+    } finally {
+      if (client) client.release();
+    }
+
+    return courses;
   }
 }
 

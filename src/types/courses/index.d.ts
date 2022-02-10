@@ -69,3 +69,13 @@ export interface CoursePopulated {
     location: string;
   }[];
 }
+
+export interface UserCourseFile extends CourseFile {
+  ongoing: boolean;
+  finished: boolean;
+}
+
+export interface UserCourse extends Omit<CoursePopulated, "price"> {
+  ongoing: boolean;
+  finished: boolean;
+}

@@ -3,7 +3,7 @@ import Jwt from "@hapi/jwt";
 
 import { UserWithoutPassword } from "@/types/user";
 
-async function userLogin(req: Request, h: ResponseToolkit) {
+async function userRetrieval(req: Request, h: ResponseToolkit) {
   const token = req.headers.authorization.split(" ")[1];
   const {
     decoded: {
@@ -24,4 +24,4 @@ async function userLogin(req: Request, h: ResponseToolkit) {
   return { user };
 }
 
-export default userLogin;
+export default userRetrieval;

@@ -1,12 +1,23 @@
 import userRegistration from "./handlers/userRegistration";
 import userLogin from "./handlers/userLogin";
 import userRetrieval from "./handlers/userRetrieval";
+import userCoursesRetrieval from "./handlers/userCoursesRetrieval";
 
 const GETs = [
   {
     method: "GET",
     path: "/user",
     handler: userRetrieval,
+    config: {
+      auth: {
+        mode: "required",
+      },
+    },
+  },
+  {
+    method: "GET",
+    path: "/user/courses",
+    handler: userCoursesRetrieval,
     config: {
       auth: {
         mode: "required",
