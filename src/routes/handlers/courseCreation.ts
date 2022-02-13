@@ -31,7 +31,8 @@ async function courseCreation(req: CourseCreationRequest, h: ResponseToolkit) {
         id: fileId,
         course_id: courseId,
         owner_id: user.id,
-        description: details.description,
+        section: details.section,
+        name: details.name,
         type: details.type,
         location,
       };

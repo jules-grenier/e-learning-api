@@ -260,21 +260,23 @@ class Database {
           (
             file_id,
             file_type,
-            file_description,
+            file_name,
             file_location,
+            section_name,
             course_id,
             owner_id,
             created_at,
             updated_at
           )
         values
-          ($1, $2, $3, $4, $5, $6, $7, $7)
+          ($1, $2, $3, $4, $5, $6, $7, $8, $8)
       `,
       values: [
         fileInfo.id,
         fileInfo.type,
-        JSON.stringify(fileInfo.description),
+        fileInfo.name,
         fileInfo.location,
+        fileInfo.section,
         fileInfo.course_id,
         fileInfo.owner_id,
         date,
@@ -339,7 +341,8 @@ class Database {
           file_id,
           file_location,
           file_type,
-          file_description,
+          file_name,
+          section_name,
           courses.*,
           courses.price as course_price,
           users.firstname || ' ' || users.lastname as author_name
@@ -378,7 +381,8 @@ class Database {
           file_id,
           file_location,
           file_type,
-          file_description,
+          file_name,
+          section_name,
           courses.*,
           courses.price as course_price,
           users.firstname || ' ' || users.lastname as author_name
@@ -473,7 +477,8 @@ class Database {
         course_files.file_id,
         course_files.file_location,
         course_files.file_type,
-        course_files.file_description,
+        course_files.file_name,
+        course_files.section_name,
         courses.*,
         "${userCoursesTable}".ongoing,
         "${userCoursesTable}".finished,

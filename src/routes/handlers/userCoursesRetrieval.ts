@@ -34,19 +34,19 @@ async function userCoursesRetrieval(req: Request, h: ResponseToolkit) {
         updated_at,
         author_name,
         author_id,
+        section_name,
         file_id,
         file_location,
         file_type,
-        file_description,
+        file_name,
         ongoing,
         finished,
       } = details;
 
-      // console.log("details", details);
-
       const fileDetails = {
         id: file_id,
-        description: file_description,
+        section: section_name,
+        name: file_name,
         type: file_type,
         location: file_location,
       };
@@ -62,10 +62,14 @@ async function userCoursesRetrieval(req: Request, h: ResponseToolkit) {
           updated_at,
           ongoing,
           finished,
-          content: [],
+          content: {},
         };
 
-      courses[course_id].content.push(fileDetails);
+      if (!courses[course_id].content[fileDetails.section]) {
+        courses[course_id].content[fileDetails.section] = [];
+      }
+
+      courses[course_id].content[fileDetails.section].push(fileDetails);
     });
   } catch (error) {
     console.error("An error occurred in userCoursesRetrieval()");

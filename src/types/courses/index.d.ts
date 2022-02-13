@@ -8,7 +8,8 @@ interface CourseFileStream extends Stream {
 }
 
 export interface CourseContentDetails {
-  description: string;
+  section: string;
+  name: string;
   type: string;
 }
 
@@ -16,7 +17,8 @@ export interface FileInfo {
   id: string;
   course_id: string;
   owner_id: string;
-  description: string;
+  section: string;
+  name: string;
   type: string;
   location: string;
 }
@@ -47,10 +49,11 @@ export interface CourseFile {
   updated_at: string;
   author_name: string;
   author_id: string;
+  section_name: string;
   file_id: string;
   file_location: string;
   file_type: string;
-  file_description: string;
+  file_name: string;
 }
 
 export interface CoursePopulated {
@@ -63,11 +66,14 @@ export interface CoursePopulated {
   created_at: string;
   updated_at: string;
   content: {
-    id: string;
-    description: string;
-    type: string;
-    location: string;
-  }[];
+    [key: string]: {
+      id: string;
+      section: string;
+      name: string;
+      type: string;
+      location: string;
+    }[];
+  };
 }
 
 export interface UserCourseFile extends CourseFile {

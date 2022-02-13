@@ -18,20 +18,22 @@ async function getCourses(req: Request, h: ResponseToolkit) {
         updated_at,
         author_name,
         author_id,
+        section_name,
         file_id,
         file_location,
         file_type,
-        file_description,
+        file_name,
       } = file;
 
       const fileDetails = {
         id: file_id,
-        description: file_description,
+        section: section_name,
+        name: file_name,
         type: file_type,
         location: file_location,
       };
 
-      if (!courses[course_id])
+      if (!courses[course_id]) {
         courses[course_id] = {
           id: course_id,
           title: course_title,
@@ -41,10 +43,15 @@ async function getCourses(req: Request, h: ResponseToolkit) {
           author_id,
           created_at,
           updated_at,
-          content: [],
+          content: {},
         };
+      }
 
-      courses[course_id].content.push(fileDetails);
+      if (!courses[course_id].content[fileDetails.section]) {
+        courses[course_id].content[fileDetails.section] = [];
+      }
+
+      courses[course_id].content[fileDetails.section].push(fileDetails);
     });
   } catch (error) {
     console.log("Failed to get courses.", error);
